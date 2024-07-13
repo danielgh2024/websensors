@@ -1,16 +1,25 @@
 const express = require('express');
-const path = require('path');
+const http = require('http');
+const socketIo = require('socket.io');
 
 const app = express();
-const port = 3000;
+const server = http.createServer(app);
+const io = socketIo(server);
 
-// Configurar Express para servir archivos estáticos
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public')); // Servir archivos estáticos desde la carpeta 'public'
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+io.on('connection', (socket) => {
+  console.log('a user connected');
+
+  socket.on('gyroscopeData', (data) => {
+    console.log('Gyroscope data received: ', data);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
 });
 
-app.listen(port, '0.0.0.0', () => {
-  console.log(`Servidor HTTP escuchando en http://localhost:${port}`);
+server.listen(3000, () => {
+  console.log('listening on *:3000');
 });
