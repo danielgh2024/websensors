@@ -11,12 +11,32 @@
     <p id="accel">Acelerómetro: </p>
 
     <script>
+        function sendDataToServer(data) {
+            fetch('http:192.168.100.190/receive-data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+
         function handleOrientation(event) {
             const alpha = event.alpha; // Z axis
             const beta = event.beta; // X axis
             const gamma = event.gamma; // Y axis
 
+            const gyroData = { alpha, beta, gamma };
             document.getElementById('gyro').textContent = `Giroscopio - Alpha: ${alpha}, Beta: ${beta}, Gamma: ${gamma}`;
+
+            sendDataToServer({ type: 'gyro', data: gyroData });
         }
 
         function handleMotion(event) {
@@ -25,7 +45,10 @@
             const accY = acc.y;
             const accZ = acc.z;
 
+            const accelData = { x: accX, y: accY, z: accZ };
             document.getElementById('accel').textContent = `Acelerómetro - X: ${accX}, Y: ${accY}, Z: ${accZ}`;
+
+            sendDataToServer({ type: 'accel', data: accelData });
         }
 
         if (window.DeviceOrientationEvent) {
