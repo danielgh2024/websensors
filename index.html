@@ -3,63 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Acceso a Sensores</title>
+  <title>Gyroscope Data Sender</title>
 </head>
 <body>
-  <h1>Acceder a Sensores del Dispositivo Móvil</h1>
-  <p>Giroscopio: <span id="gyro-data"></span></p>
-  <p>Acelerómetro: <span id="accel-data"></span></p>
-
+  <h1>Send Gyroscope Data</h1>
+  <script src="/socket.io/socket.io.js"></script>
   <script>
-    // Verificar compatibilidad con el giroscopio
+    const socket = io();
+
     if (window.DeviceOrientationEvent) {
       window.addEventListener('deviceorientation', (event) => {
-        document.getElementById('gyro-data').innerText = 
-          `Alpha: ${event.alpha}, Beta: ${event.beta}, Gamma: ${event.gamma}`;
+        const data = {
+          alpha: event.alpha,
+          beta: event.beta,
+          gamma: event.gamma
+        };
+        socket.emit('gyroscopeData', data);
       });
     } else {
-      document.getElementById('gyro-data').innerText = 'Giroscopio no soportado';
-    }
-
-    // Verificar compatibilidad con el acelerómetro
-    if (window.DeviceMotionEvent) {
-      window.addEventListener('devicemotion', (event) => {
-        const accel = event.acceleration;
-        document.getElementById('accel-data').innerText = 
-          `X: ${accel.x}, Y: ${accel.y}, Z: ${accel.z}`;
-      });
-    } else {
-      document.getElementById('accel-data').innerText = 'Acelerómetro no soportado';
-    }
-
-    // Solicitar permisos (para iOS 13+)
-    if (typeof DeviceMotionEvent.requestPermission === 'function') {
-      DeviceMotionEvent.requestPermission()
-        .then(permissionState => {
-          if (permissionState === 'granted') {
-            window.addEventListener('devicemotion', (event) => {
-              const accel = event.acceleration;
-              document.getElementById('accel-data').innerText = 
-                `X: ${accel.x}, Y: ${accel.y}, Z: ${accel.z}`;
-            });
-          } else {
-            document.getElementById('accel-data').innerText = 'Permiso de acelerómetro denegado';
-          }
-        })
-        .catch(console.error);
-
-      DeviceOrientationEvent.requestPermission()
-        .then(permissionState => {
-          if (permissionState === 'granted') {
-            window.addEventListener('deviceorientation', (event) => {
-              document.getElementById('gyro-data').innerText = 
-                `Alpha: ${event.alpha}, Beta: ${event.beta}, Gamma: ${event.gamma}`;
-            });
-          } else {
-            document.getElementById('gyro-data').innerText = 'Permiso de giroscopio denegado';
-          }
-        })
-        .catch(console.error);
+      console.log("DeviceOrientationEvent is not supported");
     }
   </script>
 </body>
