@@ -6,11 +6,11 @@
     <title>Sensor Data</title>
 </head>
 <body>
-    <h1>Sending Sensor Data to Server 0622</h1>
+    <h1>Sending Sensor Data to Server 0633</h1>
     <script>
         async function sendSensorData(data) {
             try {
-                const response = await fetch('https://192.168.100.190/sensor-data', {
+                const response = await fetch('https://192.168.100.190:443/sensor-data', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
