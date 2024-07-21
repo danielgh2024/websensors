@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gantt Diagram with Blockly</title>
+    <title>Gantt Diagram with Blocks</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="blocklyDiv" style="height: 480px; width: 600px;"></div>
+    <h1>Gantt Diagram</h1>
+    <div class="controls">
+        <button onclick="addTask()">Add Task</button>
+    </div>
+    <div id="taskInputs"></div>
     <div id="ganttChart"></div>
-    <button onclick="generateGanttFromBlocks()">Generate Gantt Chart</button>
-    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
     <script src="https://d3js.org/d3.v6.min.js"></script>
     <script src="script.js"></script>
 </body>
