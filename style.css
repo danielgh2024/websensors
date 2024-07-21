@@ -1,0 +1,12 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: space-around;
+    margin: 20px;
+}
+
+#ganttChart {
+    width: 600px;
+    height: 480px;
+    border: 1px solid #ccc;
+}
