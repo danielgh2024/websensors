@@ -1,45 +1,16 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sensor Data</title>
+    <title>Gantt Diagram with Blockly</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Sensor Data 0701</h1>
-    <p id="gyro"></p>
-    <p id="accel"></p>
-
-    <script>
-        if ('DeviceOrientationEvent' in window) {
-            window.addEventListener('deviceorientation', (event) => {
-                const { alpha, beta, gamma } = event;
-                document.getElementById('gyro').innerText = `Gyroscope - Alpha: ${alpha}, Beta: ${beta}, Gamma: ${gamma}`;
-                sendData('gyroscope', { alpha, beta, gamma });
-            });
-        }
-
-        if ('DeviceMotionEvent' in window) {
-            window.addEventListener('devicemotion', (event) => {
-                const { acceleration } = event;
-                const { x, y, z } = acceleration;
-                document.getElementById('accel').innerText = `Accelerometer - X: ${x}, Y: ${y}, Z: ${z}`;
-                sendData('accelerometer', { x, y, z });
-            });
-        }
-
-        function sendData(sensorType, data) {
-            fetch('https://192.168.100.190:443', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ sensorType, data })
-            })
-            .then(response => response.text())
-            .then(result => console.log('Success:', result))
-            .catch(error => console.error('Error:', error));
-        }
-    </script>
+    <div id="blocklyDiv" style="height: 480px; width: 600px;"></div>
+    <div id="ganttChart"></div>
+    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
