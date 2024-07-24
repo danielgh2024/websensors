@@ -20,6 +20,7 @@
 </head>
 <body>
     <h1>Device Sensors Data</h1>
+    <button id="start">Start</button>
     <div id="acceleration" class="sensor-data">
         <h2>Acceleration</h2>
         <p>X: <span id="acceleration-x">0</span></p>
@@ -33,24 +34,47 @@
         <p>Gamma: <span id="rotation-gamma">0</span></p>
     </div>
     <script>
-        if (window.DeviceMotionEvent) {
-            window.addEventListener('devicemotion', function(event) {
-                document.getElementById('acceleration-x').textContent = event.acceleration.x.toFixed(2);
-                document.getElementById('acceleration-y').textContent = event.acceleration.y.toFixed(2);
-                document.getElementById('acceleration-z').textContent = event.acceleration.z.toFixed(2);
-            });
-        } else {
-            alert("DeviceMotionEvent is not supported");
-        }
+        document.getElementById('start').addEventListener('click', function() {
+            if (typeof DeviceMotionEvent.requestPermission === 'function' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                // Request permission for both DeviceMotion and DeviceOrientation
+                Promise.all([
+                    DeviceMotionEvent.requestPermission(),
+                    DeviceOrientationEvent.requestPermission()
+                ])
+                .then(results => {
+                    if (results.every(result => result === 'granted')) {
+                        startSensorListeners();
+                    } else {
+                        alert('Permission denied');
+                    }
+                })
+                .catch(console.error);
+            } else {
+                // Non iOS 13+ devices
+                startSensorListeners();
+            }
+        });
 
-        if (window.DeviceOrientationEvent) {
-            window.addEventListener('deviceorientation', function(event) {
-                document.getElementById('rotation-alpha').textContent = event.alpha.toFixed(2);
-                document.getElementById('rotation-beta').textContent = event.beta.toFixed(2);
-                document.getElementById('rotation-gamma').textContent = event.gamma.toFixed(2);
-            });
-        } else {
-            alert("DeviceOrientationEvent is not supported");
+        function startSensorListeners() {
+            if (window.DeviceMotionEvent) {
+                window.addEventListener('devicemotion', function(event) {
+                    document.getElementById('acceleration-x').textContent = event.acceleration.x ? event.acceleration.x.toFixed(2) : 'N/A';
+                    document.getElementById('acceleration-y').textContent = event.acceleration.y ? event.acceleration.y.toFixed(2) : 'N/A';
+                    document.getElementById('acceleration-z').textContent = event.acceleration.z ? event.acceleration.z.toFixed(2) : 'N/A';
+                });
+            } else {
+                alert("DeviceMotionEvent is not supported");
+            }
+
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientation', function(event) {
+                    document.getElementById('rotation-alpha').textContent = event.alpha ? event.alpha.toFixed(2) : 'N/A';
+                    document.getElementById('rotation-beta').textContent = event.beta ? event.beta.toFixed(2) : 'N/A';
+                    document.getElementById('rotation-gamma').textContent = event.gamma ? event.gamma.toFixed(2) : 'N/A';
+                });
+            } else {
+                alert("DeviceOrientationEvent is not supported");
+            }
         }
     </script>
 </body>
