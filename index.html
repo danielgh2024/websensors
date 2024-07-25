@@ -21,16 +21,50 @@
             padding: 10px;
             border-radius: 5px;
         }
+        .menu {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        .menu label, .menu input {
+            display: block;
+            margin: 5px 0;
+        }
+        .submenu {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="sensor-data">
-        <h2>Sensor Data 2</h2>
+        <h2>Sensor Data 3</h2>
         <p>Alpha: <span id="rotation-alpha">0</span></p>
         <p>Beta: <span id="rotation-beta">0</span></p>
         <p>Gamma: <span id="rotation-gamma">0</span></p>
     </div>
     <button id="start">Start</button>
+    <button id="settings">Settings</button>
+
+    <div class="menu" id="settings-menu">
+        <h3>Adjust Model</h3>
+        <label>
+            Initial Rotation X:
+            <input type="number" id="init-rotation-x" value="0">
+        </label>
+        <label>
+            Initial Rotation Y:
+            <input type="number" id="init-rotation-y" value="180">
+        </label>
+        <label>
+            Initial Rotation Z:
+            <input type="number" id="init-rotation-z" value="0">
+        </label>
+        <button id="apply-settings">Apply</button>
+    </div>
 
     <!-- Incluye Three.js desde el CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -62,9 +96,7 @@
 
                 // Ajusta la posición inicial del modelo
                 car.position.set(0, -1, 0); // Ejemplo de posicionamiento
-
-                // Ajusta la rotación inicial del modelo (en radianes)
-                car.rotation.set(THREE.Math.degToRad(180), THREE.Math.degToRad(0), THREE.Math.degToRad(180)); // Ejemplo de rotación inicial
+                applyInitialRotation();
 
                 car.scale.set(0.5, 0.5, 0.5); // Ajusta la escala según sea necesario
             });
@@ -99,6 +131,15 @@
             }
         });
 
+        document.getElementById('settings').addEventListener('click', function() {
+            const menu = document.getElementById('settings-menu');
+            menu.style.display = menu.style.display === 'none' || menu.style.display === '' ? 'block' : 'none';
+        });
+
+        document.getElementById('apply-settings').addEventListener('click', function() {
+            applyInitialRotation();
+        });
+
         function handleOrientation(event) {
             rotationX = event.beta ? event.beta : 0;  // En grados en el rango [-180,180]
             rotationY = event.gamma ? event.gamma : 0; // En grados en el rango [-90,90]
@@ -107,6 +148,20 @@
             document.getElementById('rotation-alpha').textContent = rotationZ.toFixed(2);
             document.getElementById('rotation-beta').textContent = rotationX.toFixed(2);
             document.getElementById('rotation-gamma').textContent = rotationY.toFixed(2);
+        }
+
+        function applyInitialRotation() {
+            const initRotationX = parseFloat(document.getElementById('init-rotation-x').value);
+            const initRotationY = parseFloat(document.getElementById('init-rotation-y').value);
+            const initRotationZ = parseFloat(document.getElementById('init-rotation-z').value);
+
+            if (car) {
+                car.rotation.set(
+                    THREE.Math.degToRad(initRotationX),
+                    THREE.Math.degToRad(initRotationY),
+                    THREE.Math.degToRad(initRotationZ)
+                );
+            }
         }
 
         init();
