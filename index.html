@@ -41,7 +41,7 @@
 </head>
 <body>
     <div class="sensor-data">
-        <h2>Sensor Data 5</h2>
+        <h2>Sensor Data 6</h2>
         <p>Alpha: <span id="rotation-alpha">0</span></p>
         <p>Beta: <span id="rotation-beta">0</span></p>
         <p>Gamma: <span id="rotation-gamma">0</span></p>
@@ -96,6 +96,9 @@
 
     <!-- Incluye OBJLoader desde el CDN -->
     <script src="https://cdn.rawgit.com/mrdoob/three.js/r128/examples/js/loaders/OBJLoader.js"></script>
+    
+    <!-- Incluye MTLLoader desde el CDN -->
+    <script src="https://cdn.rawgit.com/mrdoob/three.js/r128/examples/js/loaders/MTLLoader.js"></script>
 
     <script>
         let scene, camera, renderer, car;
@@ -115,19 +118,26 @@
             light.position.set(1, 1, 1).normalize();
             scene.add(light);
 
-            // Carga el modelo OBJ
-            const loader = new THREE.OBJLoader();
-            loader.load('car_model.obj', function(object) {
-                car = object;
-                scene.add(car);
+            // Carga el archivo MTL
+            const mtlLoader = new THREE.MTLLoader();
+            mtlLoader.load('path/to/your/car_model.mtl', function(materials) {
+                materials.preload();
 
-                // Ajusta la posición inicial del modelo
-                car.position.set(0, -1, 0); // Ejemplo de posicionamiento
+                // Carga el modelo OBJ usando el archivo MTL
+                const objLoader = new THREE.OBJLoader();
+                objLoader.setMaterials(materials);
+                objLoader.load('car_model.obj', function(object) {
+                    car = object;
+                    scene.add(car);
 
-                // Aplica la rotación inicial
-                car.rotation.set(initialRotation.x, initialRotation.y, initialRotation.z);
+                    // Ajusta la posición inicial del modelo
+                    car.position.set(0, -1, 0); // Ejemplo de posicionamiento
 
-                car.scale.set(0.5, 0.5, 0.5); // Ajusta la escala según sea necesario
+                    // Aplica la rotación inicial
+                    car.rotation.set(initialRotation.x, initialRotation.y, initialRotation.z);
+
+                    car.scale.set(0.5, 0.5, 0.5); // Ajusta la escala según sea necesario
+                });
             });
 
             camera.position.z = 5;
