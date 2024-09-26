@@ -61,13 +61,14 @@
             }
         });
 
-        // Iniciar la cámara y enviar video a Mediapipe
+        // Iniciar la cámara trasera y enviar video a Mediapipe
         const cameraUtils = new Camera(video, {
             onFrame: async () => {
                 await hands.send({ image: video });
             },
             width: 640,
-            height: 480
+            height: 480,
+            facingMode: { exact: "environment" }  // Esto especifica el uso de la cámara trasera
         });
 
         cameraUtils.start();
