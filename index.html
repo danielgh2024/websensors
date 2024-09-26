@@ -3,25 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebAR.js Example</title>
-    <script src="https://cdn.jsdelivr.net/npm/webar.js@latest"></script>
-    <style>
-        body { margin: 0; overflow: hidden; }
-    </style>
+    <title>A-Frame + AR.js Example</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/3.3.2/aframe/build/aframe-ar.js"></script>
 </head>
-<body>
-    <div id="webar-container"></div>
-    <script>
-        const webar = new WebAR({
-            container: document.getElementById('webar-container'),
-            markerImage: 'https://files.vecteezy.com/system/resource/files/12640597/042cm01gift_boxac001.png',
-            onMarkerFound: () => {
-                alert('Marker found!');
-                // Aquí puedes añadir lógica para mostrar un objeto 3D o contenido adicional
-            }
-        });
-
-        webar.start();
-    </script>
+<body style="margin: 0; overflow: hidden;">
+    <a-scene embedded arjs>
+        <a-marker preset="hiro">
+            <a-box position="0 0.5 0" material="color: red;"></a-box>
+        </a-marker>
+        <a-entity camera></a-entity>
+    </a-scene>
 </body>
 </html>
