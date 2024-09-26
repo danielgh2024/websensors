@@ -5,17 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebAR.js Example</title>
     <script src="https://cdn.jsdelivr.net/npm/webar.js@latest"></script>
+    <style>
+        body { margin: 0; overflow: hidden; }
+    </style>
 </head>
 <body>
     <div id="webar-container"></div>
     <script>
-        // Configuración básica de WebAR.js
         const webar = new WebAR({
             container: document.getElementById('webar-container'),
             markerImage: 'https://webar.example.com/my-marker-image.png',
             onMarkerFound: () => {
                 alert('Marker found!');
-                // Añade tu lógica de AR aquí
+                // Aquí puedes añadir lógica para mostrar un objeto 3D o contenido adicional
             }
         });
 
