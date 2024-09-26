@@ -24,7 +24,7 @@
     </style>
 </head>
 <body>
-    <div id="coordinates">X: 0, Y: 0</div>
+    <div id="coordinates">No se detecta la mano</div>
     <script>
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -63,6 +63,8 @@
         });
 
         hands.onResults(results => {
+            const coordinatesDiv = document.getElementById('coordinates');
+
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
                 const landmarks = results.multiHandLandmarks[0];
                 const x = (landmarks[8].x * 2 - 1);
@@ -72,8 +74,10 @@
                 cube.position.set(x, y, 0);
 
                 // Mostrar las coordenadas en pantalla
-                const coordinatesDiv = document.getElementById('coordinates');
                 coordinatesDiv.innerText = `X: ${x.toFixed(2)}, Y: ${y.toFixed(2)}`;
+            } else {
+                // Si no se detecta la mano, mostrar un mensaje
+                coordinatesDiv.innerText = "No se detecta la mano";
             }
         });
 
