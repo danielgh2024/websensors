@@ -51,10 +51,12 @@
         });
 
         hands.onResults(results => {
+            console.log('Hand tracking results:', results);
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
                 const landmarks = results.multiHandLandmarks[0];
                 const x = (landmarks[8].x * 2 - 1);
                 const y = -(landmarks[8].y * 2 - 1);
+                console.log('Moving cube to:', x, y);
                 cube.position.set(x, y, 0);
             }
         });
