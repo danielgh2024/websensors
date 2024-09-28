@@ -8,14 +8,14 @@
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
   </head>
   <body style="margin: 0; overflow: hidden;">
-    <a-scene embedded arjs>
+    <a-scene embedded arjs='sourceType: webcam; videoTexture: true; trackingMethod: best; debugUIEnabled: false;'>
       <!-- Marcador Hiro: puedes cambiar el preset por 'kanji' u otros -->
       <a-marker preset="hiro">
         <!-- Caja 3D interactiva -->
-        <a-box position="0 0.5 0" rotation="0 45 0" color="red" click-action></a-box>
+        <a-box position="0 0.5 -5" rotation="0 45 0" color="red" click-action></a-box>
       </a-marker>
-      <!-- Cámara -->
-      <a-entity camera></a-entity>
+      <!-- Cámara con ajustes de posición para evitar zoom excesivo -->
+      <a-entity camera position="0 0 5"></a-entity>
     </a-scene>
     <script>
       // Acción personalizada al hacer clic
@@ -23,9 +23,7 @@
         init: function () {
           var el = this.el;
           el.addEventListener('click', function () {
-            // Aquí defines la acción que ocurrirá al tocar el objeto en AR
             alert("Has tocado el objeto 3D");
-            // Puedes hacer algo más aquí, como redirigir a otra página, etc.
           });
         }
       });
