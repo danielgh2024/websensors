@@ -1,111 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hand Tracking with Mediapipe and Three.js</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
-    <style>
-        body { margin: 0; overflow: hidden; }
-        canvas { display: block; }
-        #coordinates {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            color: white;
-            font-size: 18px;
-            z-index: 10;
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 5px;
-            border-radius: 5px;
-        }
-    </style>
-</head>
-<body>
-    <div id="coordinates">No se detecta la mano</div>
+    <title>Web AR Interactive Wall</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  </head>
+  <body style="margin: 0; overflow: hidden;">
+    <a-scene embedded arjs>
+      <!-- Marcador Hiro: puedes cambiar el preset por 'kanji' u otros -->
+      <a-marker preset="hiro">
+        <!-- Caja 3D interactiva -->
+        <a-box position="0 0.5 0" rotation="0 45 0" color="red" click-action></a-box>
+      </a-marker>
+      <!-- Cámara -->
+      <a-entity camera></a-entity>
+    </a-scene>
     <script>
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        // Crear un plano que mostrará el video de la cámara como textura
-        const video = document.createElement('video');
-        video.setAttribute('autoplay', '');
-        video.setAttribute('playsinline', ''); // Necesario para iOS
-        const videoTexture = new THREE.VideoTexture(video);
-        const videoMaterial = new THREE.MeshBasicMaterial({ map: videoTexture });
-        const videoGeometry = new THREE.PlaneGeometry(2, 2);
-        const videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
-        videoMesh.position.z = -1;  // Mover el plano de video hacia atrás
-        scene.add(videoMesh);
-
-        // Añadir un cubo que se moverá con el dedo
-        const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
-        const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-        const cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
-
-        camera.position.z = 1;
-
-        // Configuración de Mediapipe
-        const hands = new Hands({
-            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
-        });
-
-        hands.setOptions({
-            maxNumHands: 1,
-            minDetectionConfidence: 0.5,
-            minTrackingConfidence: 0.5
-        });
-
-        hands.onResults(results => {
-            const coordinatesDiv = document.getElementById('coordinates');
-
-            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-                const landmarks = results.multiHandLandmarks[0];
-                const x = (landmarks[8].x * 2 - 1);
-                const y = -(landmarks[8].y * 2 - 1);
-
-                // Actualizar la posición del cubo
-                cube.position.set(x, y, 0);
-
-                // Mostrar las coordenadas en pantalla
-                coordinatesDiv.innerText = `X: ${x.toFixed(2)}, Y: ${y.toFixed(2)}`;
-            } else {
-                // Si no se detecta la mano, mostrar un mensaje
-                coordinatesDiv.innerText = "No se detecta la mano";
-            }
-        });
-
-        // Iniciar la cámara trasera y enviar video a Mediapipe
-        const cameraUtils = new Camera(video, {
-            onFrame: async () => {
-                await hands.send({ image: video });
-            },
-            width: 640,
-            height: 480,
-            facingMode: { exact: "environment" }  // Esto especifica el uso de la cámara trasera
-        });
-
-        cameraUtils.start();
-
-        // Animación de Three.js
-        function animate() {
-            requestAnimationFrame(animate);
-            renderer.render(scene, camera);
+      // Acción personalizada al hacer clic
+      AFRAME.registerComponent('click-action', {
+        init: function () {
+          var el = this.el;
+          el.addEventListener('click', function () {
+            // Aquí defines la acción que ocurrirá al tocar el objeto en AR
+            alert("Has tocado el objeto 3D");
+            // Puedes hacer algo más aquí, como redirigir a otra página, etc.
+          });
         }
-        animate();
-
-        // Ajustar la escena al cambiar el tamaño de la ventana
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+      });
     </script>
-</body>
+  </body>
 </html>
