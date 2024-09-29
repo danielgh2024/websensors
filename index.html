@@ -4,29 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web AR Interactive Wall</title>
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/AR-js-org/AR.js/3.3.2/aframe/build/aframe-ar.js"></script>
   </head>
   <body style="margin: 0; overflow: hidden;">
-    <a-scene embedded arjs='sourceType: webcam; videoTexture: true; trackingMethod: best; debugUIEnabled: false;'>
+    <a-scene embedded arjs='sourceType: webcam; videoTexture: true; trackingMethod: best;'>
       <!-- Marcador Hiro -->
       <a-marker preset="hiro">
         <!-- Objeto 3D -->
-        <a-box position="0 0 0" rotation="0 45 0" scale="0.5 0.5 0.5" color="red" click-action></a-box>
+        <a-box position="0 0.5 0" rotation="0 45 0" scale="0.5 0.5 0.5" color="red"></a-box>
       </a-marker>
       <!-- Cámara -->
       <a-entity camera></a-entity>
     </a-scene>
-    <script>
-      // Acción personalizada al hacer clic
-      AFRAME.registerComponent('click-action', {
-        init: function () {
-          var el = this.el;
-          el.addEventListener('click', function () {
-            alert("Has tocado el objeto 3D");
-          });
-        }
-      });
-    </script>
   </body>
 </html>
