@@ -9,13 +9,13 @@
   </head>
   <body style="margin: 0; overflow: hidden;">
     <a-scene embedded arjs='sourceType: webcam; videoTexture: true; trackingMethod: best; debugUIEnabled: false;'>
-      <!-- Marcador Hiro: puedes cambiar el preset por 'kanji' u otros -->
+      <!-- Marcador Hiro -->
       <a-marker preset="hiro">
-        <!-- Caja 3D interactiva -->
-        <a-box position="0 0.5 -5" rotation="0 45 0" color="red" click-action></a-box>
+        <!-- Objeto 3D -->
+        <a-box position="0 0 0" rotation="0 45 0" scale="0.5 0.5 0.5" color="red" click-action></a-box>
       </a-marker>
-      <!-- Cámara con ajustes de posición para evitar zoom excesivo -->
-      <a-entity camera position="0 0 5"></a-entity>
+      <!-- Cámara -->
+      <a-entity camera></a-entity>
     </a-scene>
     <script>
       // Acción personalizada al hacer clic
