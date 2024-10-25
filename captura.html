@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Captura de Foto</title>
+    <style>
+        @font-face {
+            font-family: 'Motlow Caps';
+            src: url('/static/motlow-caps.ttf') format('truetype');
+        }
+
+        body {
+            font-family: 'Motlow Caps', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #FF9800;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('/static/fondo2.png') center center / cover no-repeat;
+            z-index: -1;
+        }
+
+        .icon-container img {
+            width: 80px;
+            height: auto;
+        }
+
+        .capture-container {
+            position: relative;
+            width: 80%;
+            max-width: 450px;
+            background-color: black;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        video#video {
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+        }
+
+        img#thumbnail {
+            display: none;
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+        }
+
+        .button-overlay {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .button-image {
+            width: 80px;
+            height: auto;
+            cursor: pointer;
+        }
+
+        #loading {
+            display: none;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+    <div class="icon-container">
+        <img src="/static/tomar_foto.png" alt="Captura de Foto">
+    </div>
+
+    <div class="capture-container">
+        <video id="video" autoplay playsinline></video>
+        <img id="thumbnail" alt="Vista previa de la foto tomada"/>
+
+        <div class="button-overlay">
+            <img id="captureButton" src="/static/tomar_foto.png" alt="Tomar Foto" class="button-image" onclick="capturePhoto(); playClickSound();">
+            <img id="retryButton" src="/static/repetir.png" alt="Repetir" class="button-image" style="display:none;" onclick="retryPhoto(); playClickSound();">
+            <img id="sendButton" src="/static/enviar_foto.png" alt="Enviar Foto" class="button-image" style="display:none;" onclick="sendPhoto(); playClickSound();">
+        </div>
+    </div>
+
+    <div id="loading">Subiendo foto, espere por favor</div>
+
+    <audio id="clickSound" src="/static/click.mp3" preload="auto"></audio>
+
+    <script>
+        let stream;
+        let photoBlob;
+
+        // Inicializar cámara y permisos para iOS (antiguos y nuevos)
+        window.onload = function () {
+            initCamera();
+        };
+
+        async function initCamera() {
+            const resolution = localStorage.getItem('selectedResolution') || '1280x720';
+            const camera = localStorage.getItem('selectedCamera') || 'user';
+
+            const [width, height] = resolution.split('x').map(Number);
+
+            const constraints = {
+                video: {
+                    facingMode: { ideal: camera },
+                    width: { ideal: width },
+                    height: { ideal: height }
+                }
+            };
+
+            try {
+                // Solicitar permisos de cámara
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+
+                if (camera === 'user') {
+                    video.style.transform = 'scaleX(-1)'; // Espejar cámara frontal
+                } else {
+                    video.style.transform = 'scaleX(1)'; // Sin espejar cámara trasera
+                }
+            } catch (err) {
+                alert('Permisos de cámara denegados. Asegúrese de haber dado acceso.');
+                console.error('Error al acceder a la cámara: ', err.message);
+            }
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('video');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+
+            // Espejar imagen si se usa cámara frontal
+            if (localStorage.getItem('selectedCamera') === 'user') {
+                context.translate(canvas.width, 0);
+                context.scale(-1, 1);
+            }
+
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            stream.getTracks().forEach(track => track.stop());
+
+            canvas.toBlob(blob => {
+                photoBlob = blob;
+                const thumbnail = document.getElementById('thumbnail');
+                thumbnail.src = URL.createObjectURL(blob);
+                thumbnail.style.display = 'block';
+                video.style.display = 'none';
+
+                document.getElementById('captureButton').style.display = 'none';
+                document.getElementById('sendButton').style.display = 'inline';
+                document.getElementById('retryButton').style.display = 'inline';
+            }, 'image/png');
+        }
+
+        function retryPhoto() {
+            document.getElementById('thumbnail').style.display = 'none';
+            document.getElementById('sendButton').style.display = 'none';
+            document.getElementById('retryButton').style.display = 'none';
+            document.getElementById('captureButton').style.display = 'inline';
+            document.getElementById('video').style.display = 'block';
+            initCamera();
+        }
+
+        async function sendPhoto() {
+            const loadingMessage = document.getElementById('loading');
+            loadingMessage.style.display = 'block';
+
+            const formData = new FormData();
+            formData.append('photo', photoBlob, 'imagen.png');
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error('Error al enviar la foto.');
+
+                window.location.href = '/descarga';
+            } catch (error) {
+                console.error('Error al enviar la foto:', error.message);
+            } finally {
+                loadingMessage.style.display = 'none';
+            }
+        }
+
+        function playClickSound() {
+            const clickSound = document.getElementById('clickSound');
+            clickSound.play();
+        }
+    </script>
+</body>
+</html>

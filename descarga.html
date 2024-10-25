@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Descarga de Foto</title>
+    <style>
+        @font-face {
+            font-family: 'Motlow Caps';
+            src: url('/static/motlow-caps.ttf') format('truetype');
+        }
+
+        body {
+            font-family: 'Motlow Caps', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #FF9800;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('/static/fondo3.png') center center / cover no-repeat;
+            z-index: -1;
+        }
+
+        .button-image {
+            width: 150px;
+            height: auto;
+            cursor: pointer;
+            transform: translateX(12%);
+        }
+
+        #loading {
+            display: none;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+
+    <img src="/static/descargar_foto.png" class="button-image" onclick="downloadPhoto(); playClickSound();">
+
+    <audio id="clickSound" src="/static/click.mp3" preload="auto"></audio>
+
+    <div id="loading">Descargando, espere por favor...</div>
+
+    <script>
+        async function downloadPhoto() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.platform) || 
+                          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+            try {
+                if (isIOS) {
+                    alert("La descarga comenzará automáticamente.");
+                }
+
+                // Verificar si la imagen está disponible
+                const response = await fetch('/check-image');
+                if (!response.ok) {
+                    throw new Error('No se encontró la imagen. Siga los pasos de la pantalla antes de descargar.');
+                }
+
+                // Descargar la imagen
+                const link = document.createElement('a');
+                link.href = '/download';
+                link.download = 'FINAL.png';
+                link.click();
+
+                if (!isIOS) {
+                    document.getElementById('loading').style.display = 'block';
+                }
+
+            } catch (error) {
+                alert(error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        function playClickSound() {
+            const clickSound = document.getElementById('clickSound');
+            clickSound.play();
+        }
+    </script>
+</body>
+</html>
