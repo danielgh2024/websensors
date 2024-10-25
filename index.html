@@ -3,27 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Imagen a Pantalla Completa</title>
+    <title>Bienvenida</title>
     <style>
-        * {
+        @font-face {
+            font-family: 'Motlow Caps';
+            src: url('/static/motlow-caps.ttf') format('truetype');
+        }
+
+        body {
+            font-family: 'Motlow Caps', sans-serif;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #FF9800; /* Color naranja */
+            overflow: hidden;
+            position: relative;
         }
-        body, html {
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('/static/fondo1.png') center center / cover no-repeat;
+            z-index: -1;
+        }
+
+        .gear-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+        }
+
+        .gear-icon {
+            font-size: 30px;
+            color: black;
+            cursor: pointer;
+            opacity: 0; /* Botón completamente transparente */
+        }
+
+        .settings-menu {
+            display: none;
+            position: absolute;
+            top: 40px;
+            left: 0;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .settings-menu select {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+            display: block;
+            width: 100%;
+            color: black;
+        }
+
+        .settings-menu label {
+            color: white;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .button-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             height: 100%;
             width: 100%;
         }
-        .fullscreen-image {
-            height: 100%;
-            width: 100%;
-            background-image: url('TYC.png');
-            background-size: cover;
-            background-position: center;
+
+        .button-image {
+            max-width: 200px;
+            height: auto;
         }
     </style>
 </head>
 <body>
-    <div class="fullscreen-image"></div>
+
+    <div class="gear-container">
+        <span class="gear-icon" onclick="toggleSettingsMenu()">⚙️</span>
+        <div class="settings-menu" id="settingsMenu">
+            <label for="resolution">Resolución:</label>
+            <select id="resolution">
+                <option value="1280x720" selected>HD (1280x720)</option>
+                <option value="1920x1080">Full HD (1920x1080)</option>
+                <option value="3840x2160">4K (3840x2160)</option>
+            </select>
+            <label for="camera">Cámara:</label>
+            <select id="camera">
+                <option value="user" selected>Frontal</option>
+                <option value="environment">Trasera</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="button-container">
+        <img src="/static/ir_a_captura.png" alt="Ir a Captura" class="button-image" onclick="saveSettings(); playClickSound(); location.href='/captura'">
+    </div>
+
+    <audio id="clickSound" src="/static/click.mp3" preload="auto"></audio>
+
+    <script>
+        // Enviar señal al servidor cuando se carga la página (usuario conectado)
+        async function notifyServerOfConnection() {
+            try {
+                await fetch('/user-connected', { method: 'POST' });
+            } catch (error) {
+                console.error('Error al notificar al servidor:', error);
+            }
+        }
+
+        window.onload = function() {
+            notifyServerOfConnection();
+        };
+
+        function saveSettings() {
+            const resolution = document.getElementById('resolution').value;
+            const camera = document.getElementById('camera').value;
+
+            localStorage.setItem('selectedResolution', resolution);
+            localStorage.setItem('selectedCamera', camera);
+        }
+
+        function playClickSound() {
+            const clickSound = document.getElementById('clickSound');
+            clickSound.play();
+        }
+
+        function toggleSettingsMenu() {
+            const menu = document.getElementById('settingsMenu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+    </script>
 </body>
 </html>
